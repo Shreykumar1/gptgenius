@@ -1,6 +1,7 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import prisma from "./db";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -25,8 +26,18 @@ export async function generateChatResponse(textMessage) {
 }
 
 export const getExistingTour = async ({ city, country }) => {
-  return null
+  return  prisma.task.findUnique({
+    where : {
+      city : city,
+      country : country,
+      city_country : {
+        city,
+        country
+      }
+    }
+  })
 }
+
 
 export const generateTourResponse = async ({ city, country }) => {
   const query = `Find a ${city} in this ${country}.
@@ -62,5 +73,7 @@ export const generateTourResponse = async ({ city, country }) => {
   }
 }
 export const createNewTour = async (tour) => {
-  return null
+  return  prisma.task.create({
+    data : tour.tour
+  })
 }

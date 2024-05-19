@@ -1,4 +1,5 @@
 import React from 'react'
+import Markdown from 'react-markdown';
 
 const TourInfo = ({ tour }) => {
   console.log(tour);
@@ -11,7 +12,7 @@ const TourInfo = ({ tour }) => {
         {stops.map((stop) => {
           return (
             <li key={stop} className='mb-4 bg-base-100 p-4 rounded-xl'>
-              <p className='text'>{stop}</p>
+              <p className='text'><Markdown>{stop}</Markdown></p>
             </li>
           );
         })}

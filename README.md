@@ -1250,7 +1250,7 @@ actions.js
 
 ```js
 export const getExistingTour = async ({ city, country }) => {
-  return prisma.tour.findUnique({
+  return  prisma.task.findUnique({
     where: {
       city_country: {
         city,

@@ -5,30 +5,41 @@ import TourInfo from "./TourInfo";
 import toast from "react-hot-toast";
 
 const NewTour = () => {
-    const { mutate, isPending, data: tour } = useMutation({
-        mutationFn : async (destination) => {
-            const newTour = await generateTourResponse(destination)
-            if(newTour){
-                return newTour
-            }
-            toast.error('No matching city found...');
-            return null
-        }
-    })
+  const queryClient = useQueryClient();
+  const { mutate, isPending, data: tour } = useMutation({
+    mutationFn: async (destination) => {
+      console.log("DESTINATION ",destination);
+      const existingTour = await getExistingTour(destination);
+      console.log("Existing tour = ", existingTour);
+      if(existingTour) return {tour : existingTour }
+      const newTour = await generateTourResponse(destination);
+      console.log("NEW TOUR", newTour);
+      if (newTour) {
+        await createNewTour(newTour);
+        queryClient.invalidateQueries({ queryKey: ['tours'] });
+        return newTour
+      }
+      toast.error('No matching city found...');
+      return null
+    }
+  })
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const destination = Object.fromEntries(formData.entries())
-    // console.log(destination);
-    mutate(destination)
+    let newDest = {city : capitalizeFirstLetter(destination.city),country : capitalizeFirstLetter(destination.country)}
+    mutate(newDest)
   };
-  if(isPending){
+  if (isPending) {
     return <span className="loading loading-lg"></span>
   }
-  console.log(tour);
+  console.log("TOUR DATA ", tour);
   return (
     <>
-<form onSubmit={handleSubmit} className='max-w-2xl'>
+      <form onSubmit={handleSubmit} className='max-w-2xl'>
         <h2 className=' mb-4'>Select your dream destination</h2>
         <div className='join w-full'>
           <input
@@ -51,7 +62,7 @@ const NewTour = () => {
         </div>
       </form>
       <div className='mt-16'>
-        {tour ? <TourInfo tour={tour}/> : null}
+        {tour ? <TourInfo tour={tour} /> : null}
       </div>
     </>
   );
