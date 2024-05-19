@@ -14,7 +14,7 @@ const NewTour = () => {
       if(existingTour) return {tour : existingTour }
       const newTour = await generateTourResponse(destination);
       console.log("NEW TOUR", newTour);
-      if (newTour) {
+      if(newTour.tour) {
         await createNewTour(newTour);
         queryClient.invalidateQueries({ queryKey: ['tours'] });
         return newTour
@@ -29,7 +29,8 @@ const NewTour = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const destination = Object.fromEntries(formData.entries())
+    const destination = Object.fromEntries(formData.entries());
+    console.log("Dest = ",destination);
     let newDest = {city : capitalizeFirstLetter(destination.city),country : capitalizeFirstLetter(destination.country)}
     mutate(newDest)
   };

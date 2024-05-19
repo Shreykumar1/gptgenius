@@ -63,9 +63,10 @@ export const generateTourResponse = async ({ city, country }) => {
   
     const result = await model.generateContent(prompt);
     const response = await result.response;
+    console.log("Response ", response);
     const text = response.text();
-    console.log(text);
     const tour = JSON.parse(text)
+    console.log("Generate Text = ",tour);
     return tour;
   } catch (error) {
     console.log(error);
@@ -73,7 +74,41 @@ export const generateTourResponse = async ({ city, country }) => {
   }
 }
 export const createNewTour = async (tour) => {
+  console.log("Create Tour",tour);
   return  prisma.task.create({
     data : tour.tour
   })
 }
+
+export const getAllTours = async (searchTerm) => {
+  if (!searchTerm) {
+    const tours = await prisma.task.findMany({
+      orderBy: {
+        city: 'asc',
+      },
+    });
+
+    return tours;
+  }
+
+  const tours = await prisma.task.findMany({
+    where: {
+      OR: [
+        {
+          city: {
+            contains: searchTerm,
+          },
+        },
+        {
+          country: {
+            contains: searchTerm,
+          },
+        },
+      ],
+    },
+    orderBy: {
+      city: 'asc',
+    },
+  });
+  return tours;
+};
