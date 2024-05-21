@@ -120,3 +120,72 @@ export const getSingleTour = async (id) => {
     }
   })
 }
+import {promises as fs} from "fs"
+
+// function fileToGenerativePart(path, mimeType) {
+//   return {
+//     inlineData: {
+//       data: Buffer.from(fs.readFileSync(path)).toString("base64"),
+//       mimeType
+//     },
+//   };
+// }
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
+
+
+
+
+export async function generateLandmark({type,name}) {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+
+  const prompt = "What drink is it";
+
+  // const imagePath = 'public/upload/computer-3.jpeg'
+  const imagePath = `public/upload/${name}`
+  const imageData = await fs.readFile(imagePath);
+  const imageBase64 = imageData.toString('base64');
+  const parts = [
+    { text : "Describe the image \n"},
+    {
+      inlineData : {
+        mimeType : type || "image/png",
+        data : imageBase64
+      }
+    }
+  ]
+  const result = await model.generateContent({ contents : [{role : 'user',parts}]});
+  const response = await result.response;
+  const text = response.text();
+  console.log(text);
+  return text
+}
+
+
+export async function uploadImage(data) {
+  // 'use server' 
+
+  const file = data.get('file');
+  console.log(file);
+  if (!file) {
+    throw new Error('No file uploaded');
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // With the file data in the buffer, you can do whatever you want with it.
+  // For this, we'll just write it to the filesystem in a new location
+  console.log(__dirname);
+  const path = join('C:/Users/shrey/OneDrive/Desktop/GPT Genius/gptgenius/public','/', 'upload', file.name);
+  console.log(path);
+  await writeFile(path, buffer);
+  console.log(`open ${path} to see the uploaded file`);
+  const {type,name} = file
+  const landmarkInfo = await generateLandmark({type,name})
+  // setLandmark(landmarkInfo)
+  return { landmark: landmarkInfo };
+}
+
+
+
