@@ -3,6 +3,7 @@ import { generateChatResponse } from '@/utils/action';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { SiOpenaigym } from 'react-icons/si';
 import Markdown from 'react-markdown'
 
 
@@ -44,6 +45,9 @@ const Chat = () => {
 
   return (
     <div className='min-h-[calc(100vh-6rem)] grid grid-rows-[1fr,auto]'>
+      {messages.length===0? <div className='grid place-items-center max-w-3xl'>
+        <SiOpenaigym className='w-24 h-24 text-primary ' />
+      </div>: ''}
       <div>
         {messages.map(({ role, parts }, index) => {
           const avatar = role == 'user' ? '👤' : '🤖';

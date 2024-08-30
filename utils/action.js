@@ -26,7 +26,7 @@ export async function generateChatResponse(textMessage) {
 }
 
 export const getExistingTour = async ({ city, country }) => {
-  return  prisma.task.findUnique({
+  return  prisma.tour.findUnique({
     where : {
       city : city,
       country : country,
@@ -75,14 +75,14 @@ export const generateTourResponse = async ({ city, country }) => {
 }
 export const createNewTour = async (tour) => {
   console.log("Create Tour",tour);
-  return  prisma.task.create({
+  return  prisma.tour.create({
     data : tour.tour
   })
 }
 
 export const getAllTours = async (searchTerm) => {
   if (!searchTerm) {
-    const tours = await prisma.task.findMany({
+    const tours = await prisma.tour.findMany({
       orderBy: {
         city: 'asc',
       },
@@ -91,7 +91,7 @@ export const getAllTours = async (searchTerm) => {
     return tours;
   }
 
-  const tours = await prisma.task.findMany({
+  const tours = await prisma.tour.findMany({
     where: {
       OR: [
         {
@@ -114,7 +114,7 @@ export const getAllTours = async (searchTerm) => {
 };
 
 export const getSingleTour = async (id) => {
-  return prisma.task.findUnique({
+  return prisma.tour.findUnique({
     where : {
       id : id
     }
@@ -137,16 +137,26 @@ import { join } from 'path';
 
 
 export async function generateLandmark({type,name}) {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const prompt = "What drink is it";
+  // const prompt = "What drink is it";
 
   // const imagePath = 'public/upload/computer-3.jpeg'
   const imagePath = `public/upload/${name}`
   const imageData = await fs.readFile(imagePath);
   const imageBase64 = imageData.toString('base64');
+  const prompt = `Describe the landmark historical place in the image. Provide the following details:
+  1. Name of the Landmark: Clearly state the name of the historical place.
+  2. Description: Offer a detailed description of the landmark, including its architectural style, notable features, and any important aspects of its appearance.
+  3. Historical Significance: Explain the historical importance of this landmark. Include information about its origin, historical events associated with it, and its role in history.
+  4. Address: Provide the full address or location details of the landmark, including city, state/province, and country.
+  5. Additional Information: Mention any interesting facts, visitor information, or current status if available.
+  
+  Make sure to be thorough and provide a comprehensive overview.
+  Give in the form of markdown and make the label bold`;
+  
   const parts = [
-    { text : "Describe the image \n"},
+    { text : prompt},
     {
       inlineData : {
         mimeType : type || "image/png",
