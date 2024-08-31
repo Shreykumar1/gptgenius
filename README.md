@@ -14,7 +14,7 @@ npm install @clerk/nextjs@5.0.1 @prisma/client@5.5.2 @tanstack/react-query@5.8.1
 ```sh
 npm install -D @tailwindcss/typography@0.5.10  daisyui@3.9.4 prisma@5.5.2
 ```
-
+![Screenshot 2024-08-29 224014](https://github.com/user-attachments/assets/a279e31d-528a-41ec-bd49-939b12fe6014)
 ## DaisyUI
 
 - remove default code from globals.css
