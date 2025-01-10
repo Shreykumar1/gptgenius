@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "./providers";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon16.ico" />
       </head>
         <body className={inter.className}>
+          <SpeedInsights />
           <Providers>
           {children}
           </Providers>
