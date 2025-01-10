@@ -6,6 +6,7 @@ const links = [
     {href : '/tours', label : 'tours'},
     {href : '/tours/new-tour', label : 'new tour'},
     {href : '/landmark/upload', label : 'landmark'},
+    {href : '/medic', label : 'medic'},
     {href : '/profile', label : 'profile'},
 ]
 
