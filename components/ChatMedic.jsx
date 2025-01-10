@@ -50,6 +50,7 @@ const ChatMedic = () => {
     <div className='min-h-[calc(100vh-8rem)] grid grid-rows-[1fr,auto]'>
       {messages.length===0? <div className='grid place-items-center max-w-3xl'>
         <FaBookMedical className='w-24 h-24 text-primary ' />
+        <p className='text-center text-2xl font-bold'>Feel free to ask questions about medicine and health</p>
       </div>: ''}
       <div className='max-h-[calc(100vh-12rem)] overflow-auto'>
         {messages.map(({ role, parts }, index) => {
