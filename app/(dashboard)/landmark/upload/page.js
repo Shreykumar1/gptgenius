@@ -20,21 +20,26 @@ const LandmarkUpload = () => {
       const data = new FormData();
       data.set("file", file);
       setLoading(true);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      });
-      // handle the error
+      const blob = new Blob([file], { type: file.type });
 
-      if (!res.ok) throw new Error(await res.text());
-      const resData = await res.json();
-      setResult(resData.data);
-      console.log(resData);
-      const { name, type } = resData.data;
-      const landmarkInfo = await generateLandmark({ type, name });
-      console.log(landmarkInfo);
-      setLandmark(landmarkInfo);
-      setLoading(false);
+      const blobUrl = URL.createObjectURL(blob);
+      // Convert Blob to Base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result; // This is the Base64 string
+        // Strip the prefix if it exists
+        const base64String = base64data.split(',')[1]; // Get only the Base64 part
+        const resData = { data: { name: file.name, type: file.type, base64: base64String } };
+        setResult(resData.data);
+        setResult({...resData.data,url:blobUrl});
+        console.log(resData);
+        const { name, type, base64 } = resData.data;
+        const landmarkInfo = await generateLandmark({ type, name, base64 }); // Pass Base64 data
+        console.log(landmarkInfo);
+        setLandmark(landmarkInfo);
+        setLoading(false);
+      };
+      reader.readAsDataURL(blob); // Read the Blob as a Data URL (Base64)
     } catch (e) {
       // Handle errors here
       toast.error("something went wrong");
@@ -48,7 +53,7 @@ const LandmarkUpload = () => {
   return (
     <>
       <form onSubmit={onSubmit}>
-        <h3 class="mb-2 text-xl font-extrabold leading-none tracking-loose text-neutral  ">
+        <h3 class="mb-2 mt-4 md:mt-0 text-sm md:text-xl font-extrabold leading-none tracking-loose text-neutral  ">
           Upload{" "}
           <mark class="px-2 text-white bg-blue-600 rounded dark:bg-primary">
             Landmark
@@ -59,25 +64,26 @@ const LandmarkUpload = () => {
   Share a photo of a landmark and receive its text description.
 </p> */}
 
-        <div className="join w-full">
+        <div className="md:join w-full max-w-5xl">
           {/* className=" join-item  text-xl text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" */}
           <input
             type="file"
-            className="input input-bordered join-item h-10 pt-0.5 text-lg rounded-lg "
+            className="input input-bordered w-full sm:w-auto join-item px-0.5 sm:px-1 py-2 h-auto sm:h-10 md:pt-0.5 text-sm sm:text-lg rounded-lg "
+            // className="input input-bordered join-item px-0.5 py-2 h-auto sm:h-10 md:pt-0.5 text-sm md:text-lg rounded-lg "
             id="file_input"
             name="file"
             onChange={(e) => setFile(e.target.files?.[0])}
           />
 
           <button
-            className="btn btn-sm h-10 btn-primary join-item"
+            className="btn btn-sm  w-full mt-2 md:mt-0 md:w-auto md:h-10 btn-primary join-item"
             type="submit"
           >
             Upload
           </button>
         </div>
         <p
-          class="mt-2 mb-10 text-md  text-gray-500 dark:text-gray-300"
+          class="mt-2 mb-10 text-xs sm:text-base  text-gray-500 dark:text-gray-300"
           id="file_input_help"
         >
           PNG, JPEG (MAX. 800x400px).
@@ -86,10 +92,10 @@ const LandmarkUpload = () => {
       {landmark ? (
         <div className="max-w-2xl">
           <Image
-            src={result.url}
-            width={500}
-            height={500}
-            className="w-64 h-64 rounded-lg shadow-lg mb-4"
+            src={result.url || 'blob:http://localhost:3000/9730b5d2-fc43-40e3-844d-cab3d4a947cd'}
+            width={400}
+            height={300}
+            className="w-36 h-28 md:w-auto md:h-auto rounded-lg shadow-lg mb-4"
           />
           <h3 className="leading-loose">
             <Markdown>{landmark}</Markdown>

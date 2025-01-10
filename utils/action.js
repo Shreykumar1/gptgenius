@@ -136,15 +136,15 @@ import { join } from 'path';
 
 
 
-export async function generateLandmark({type,name}) {
+export async function generateLandmark({type,name,base64}) {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   // const prompt = "What drink is it";
 
   // const imagePath = 'public/upload/computer-3.jpeg'
-  const imagePath = `public/upload/${name}`
-  const imageData = await fs.readFile(imagePath);
-  const imageBase64 = imageData.toString('base64');
+  // const imagePath = url
+  // const imageData = await fs.readFile(imagePath);
+  // const imageBase64 = imageData.toString('base64');
   const prompt = `Describe the landmark historical place in the image. Provide the following details:
   1. Name of the Landmark: Clearly state the name of the historical place.
   2. Description: Offer a detailed description of the landmark, including its architectural style, notable features, and any important aspects of its appearance.
@@ -160,15 +160,20 @@ export async function generateLandmark({type,name}) {
     {
       inlineData : {
         mimeType : type || "image/png",
-        data : imageBase64
+        data : base64
       }
     }
   ]
-  const result = await model.generateContent({ contents : [{role : 'user',parts}]});
-  const response = await result.response;
-  const text = response.text();
-  console.log(text);
-  return text
+  try {
+    const result = await model.generateContent({ contents : [{role : 'user',parts}]});
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
+    return text;
+  } catch (error) {
+    console.log(error);
+    return null
+  }
 }
 
 
